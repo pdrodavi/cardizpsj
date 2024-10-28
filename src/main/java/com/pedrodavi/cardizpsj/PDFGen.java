@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -20,12 +21,16 @@ public class PDFGen {
         try {
 
             PdfWriter writer = PdfWriter.getInstance(document, baos);
-            Rectangle rect = new Rectangle(30, 30, 550, 800);
-            writer.setBoxSize("rectangle", rect);
 
             document.setPageSize(PageSize.A4);
             document.setMargins(10, 10, 10, 10);
             document.open();
+
+            Rectangle rect = new Rectangle(10, 10, document.getPageSize().getWidth() - 10, document.getPageSize().getHeight() - 10);
+            rect.setBorder(Rectangle.BOX);
+            rect.setBorderWidth(1);
+            writer.setBoxSize("rectangle", rect);
+            document.add(rect);
 
             PdfPTable table = new PdfPTable(3);
             table.setWidthPercentage(100); // Define a largura da tabela para 100% do documento
@@ -34,10 +39,24 @@ public class PDFGen {
 
             for (int i = month; i <= 4; i++) {
 
+                PdfPCell lineTop = new PdfPCell(new Phrase(""));
+                lineTop.setHorizontalAlignment(Element.ALIGN_CENTER);
+                lineTop.setBorder(Rectangle.TOP);
+                table.addCell(lineTop);
+                table.addCell(lineTop);
+                table.addCell(lineTop);
+
+                PdfPCell lineRight = new PdfPCell(new Phrase(""));
+                lineRight.setHorizontalAlignment(Element.ALIGN_CENTER);
+                lineRight.setBorder(Rectangle.RIGHT);
+                table.addCell(lineRight);
+                table.addCell(lineRight);
+                table.addCell(lineRight);
+
                 PdfPCell nomeParoquiaTitle = new PdfPCell(new Paragraph("Paróquia São José\nPaulista-PB", boldCustom(11)));
                 nomeParoquiaTitle.setHorizontalAlignment(Element.ALIGN_CENTER);
-                nomeParoquiaTitle.setBorder(1);
-                nomeParoquiaTitle.setPaddingTop(20);
+                nomeParoquiaTitle.setBorder(Rectangle.RIGHT);
+                nomeParoquiaTitle.setPaddingTop(15);
                 table.addCell(nomeParoquiaTitle);
                 table.addCell(nomeParoquiaTitle);
                 table.addCell(nomeParoquiaTitle);
@@ -51,7 +70,7 @@ public class PDFGen {
 
                 PdfPCell nomeDizimista = new PdfPCell(new Phrase(shortName(nome.toUpperCase()), boldCustom(9)));
                 nomeDizimista.setHorizontalAlignment(Element.ALIGN_LEFT);
-                nomeDizimista.setBorder(0);
+                nomeDizimista.setBorder(Rectangle.RIGHT);
                 nomeDizimista.setPaddingLeft(15);
                 nomeDizimista.setPaddingTop(5);
                 table.addCell(nomeDizimista);
@@ -59,18 +78,17 @@ public class PDFGen {
                 table.addCell(nomeDizimista);
 
                 PdfPCell cellData = new PdfPCell(new Phrase("Data: ______/______/_______\n\nValor: ____________________\n\nAss.: ____________________", normalCustom(11)));
-                cellData.setBorder(Rectangle.NO_BORDER);
-                cellData.setPaddingTop(15);
+                cellData.setBorder(Rectangle.RIGHT);
+                cellData.setPaddingTop(20);
                 cellData.setPaddingLeft(15);
                 cellData.setHorizontalAlignment(Element.ALIGN_LEFT);
                 table.addCell(cellData);
                 table.addCell(cellData);
-
                 table.addCell(cellData);
 
                 PdfPCell cellFooter = new PdfPCell(new Phrase("Dizimista consciente\nexpressa sua confiança em DEUS", new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC)));
-                cellFooter.setBorder(Rectangle.NO_BORDER);
-                cellFooter.setPaddingTop(5);
+                cellFooter.setBorder(Rectangle.RIGHT);
+                cellFooter.setPaddingTop(10);
                 cellFooter.setPaddingLeft(15);
                 cellFooter.setPaddingBottom(20);
                 cellFooter.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -94,11 +112,11 @@ public class PDFGen {
     private static PdfPCell getPdfPCell(String cod, int month) {
         String newMonth = String.valueOf(month);
         if (newMonth.length() == 1) newMonth = "0" + newMonth;
-        PdfPCell codRef = new PdfPCell(new Phrase(cod +"                                 " + newMonth + " / 2024", boldCustomRed(11)));
+        PdfPCell codRef = new PdfPCell(new Phrase(cod +"                                 " + newMonth + " / " + String.valueOf(LocalDate.now().getYear()), boldCustomRed(11)));
                         codRef.setPaddingTop(10);
                         codRef.setPaddingLeft(15);
                 codRef.setHorizontalAlignment(Element.ALIGN_LEFT);
-                codRef.setBorder(0);
+                codRef.setBorder(Rectangle.RIGHT);
         return codRef;
     }
 

@@ -32,8 +32,6 @@ public class Main {
                     nome = fullname;
                 }
 
-                shortName(fullname);
-
                 File dir = new File("C:\\Users\\pedro\\IdeaProjects\\cardizpsj-develop\\output\\");
                 if (dir.isDirectory()) {
                     File[] files = dir.listFiles();

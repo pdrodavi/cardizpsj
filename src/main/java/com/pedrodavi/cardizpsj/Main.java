@@ -9,7 +9,7 @@ import static com.pedrodavi.cardizpsj.PDFGen.shortName;
 public class Main {
     public static void main(String[] args) {
 
-        String databaseURL = "jdbc:ucanaccess://D://restore//dizimistas.accdb";
+        String databaseURL = "jdbc:ucanaccess://dizimistas.accdb";
 
         try (Connection connection = DriverManager.getConnection(databaseURL)) {
 
@@ -34,7 +34,7 @@ public class Main {
 
                 shortName(fullname);
 
-                File dir = new File("C:\\Users\\pedro\\IdeaProjects\\cardizpsj\\output\\");
+                File dir = new File("C:\\Users\\pedro\\IdeaProjects\\cardizpsj-develop\\output\\");
                 if (dir.isDirectory()) {
                     File[] files = dir.listFiles();
                     assert files != null;
@@ -51,7 +51,7 @@ public class Main {
                 byte[] bytes = generatePDF(String.valueOf(id), fullname);
                 String nameFile = String.valueOf(id) + " - " + fullname + ".pdf";
 
-                OutputStream out = new FileOutputStream("C:\\Users\\pedro\\IdeaProjects\\cardizpsj\\output\\" + nameFile);
+                OutputStream out = new FileOutputStream("C:\\Users\\pedro\\IdeaProjects\\cardizpsj-develop\\output\\" + nameFile);
                 out.write(bytes);
                 out.close();
 

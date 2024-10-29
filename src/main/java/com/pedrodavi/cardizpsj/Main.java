@@ -1,13 +1,22 @@
 package com.pedrodavi.cardizpsj;
 
+import javax.swing.*;
 import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.sql.*;
+import java.time.LocalDate;
 
 import static com.pedrodavi.cardizpsj.PDFGen.generatePDF;
-import static com.pedrodavi.cardizpsj.PDFGen.shortName;
 
 public class Main {
     public static void main(String[] args) {
+
+        Path currentDirectoryPath = FileSystems.getDefault().getPath("");
+        String currentDirectoryName = currentDirectoryPath.toAbsolutePath().toString();
+        String dirOutput = currentDirectoryName.concat("\\output\\");
+        String dirOutputPdfs = makeDir(dirOutput + "\\" + String.valueOf(LocalDate.now().getYear()));
+        dirOutput = dirOutput.concat(dirOutputPdfs + "\\");
 
         String databaseURL = "jdbc:ucanaccess://dizimistas.accdb";
 
@@ -18,21 +27,12 @@ public class Main {
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(sql);
 
-            String cod = "";
-            String nome = "";
-
             while (result.next()) {
 
                 int id = result.getInt("COD");
-                if (cod.isBlank()) {
-                    cod = String.valueOf(id);
-                }
                 String fullname = result.getString("NOME");
-                if (nome.isBlank()) {
-                    nome = fullname;
-                }
 
-                File dir = new File("C:\\Users\\pedro\\IdeaProjects\\cardizpsj-develop\\output\\");
+                File dir = new File(dirOutput);
                 if (dir.isDirectory()) {
                     File[] files = dir.listFiles();
                     assert files != null;
@@ -40,16 +40,15 @@ public class Main {
                         String fileName = fl.getName();
                         if (fileName.contains(fullname)) {
                             boolean deleted = fl.delete();
-//                            if (deleted) System.out.println("Arquivo excluido: " + fileName);
-//                            else System.out.println("Erro ao tentar excluir o arquivo " + fileName);
+                            if (!deleted) JOptionPane.showMessageDialog(null, "Erro ao tentar excluir o arquivo " + fileName);
                         }
                     }
                 }
 
                 byte[] bytes = generatePDF(String.valueOf(id), fullname);
-                String nameFile = String.valueOf(id) + " - " + fullname + ".pdf";
+                String nameFile = String.valueOf(id) + " - " + fullname + " - " + String.valueOf(LocalDate.now().getYear()) + ".pdf";
 
-                OutputStream out = new FileOutputStream("C:\\Users\\pedro\\IdeaProjects\\cardizpsj-develop\\output\\" + nameFile);
+                OutputStream out = new FileOutputStream(dirOutput + nameFile);
                 out.write(bytes);
                 out.close();
 
@@ -61,5 +60,32 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+        JOptionPane.showMessageDialog(null, "PDFS Gerados com sucesso");
+
+        try {
+            Process exec = Runtime.getRuntime().exec("explorer.exe " + dirOutput);
+            if (!exec.isAlive()) exec.destroy();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static String makeDir(String secondArg) {
+        File theDir = new File(secondArg);
+        if (!theDir.exists()) {
+            boolean result = false;
+            try{
+                theDir.mkdir();
+                result = true;
+            }
+            catch(SecurityException se){
+                //handle it
+            }
+            if(result) {
+                return theDir.getName();
+            }
+        }
+        return theDir.getName();
     }
 }

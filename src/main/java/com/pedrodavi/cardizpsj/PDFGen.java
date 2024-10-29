@@ -23,10 +23,11 @@ public class PDFGen {
             PdfWriter writer = PdfWriter.getInstance(document, baos);
 
             document.setPageSize(PageSize.A4);
-            document.setMargins(10, 10, 10, 10);
+            document.setMargins(0, 0, 10, 10);
             document.open();
 
-            Rectangle rect = new Rectangle(10, 10, document.getPageSize().getWidth() - 10, document.getPageSize().getHeight() - 10);
+//            Rectangle rect = new Rectangle(10, 10, document.getPageSize().getWidth() - 10, document.getPageSize().getHeight() - 10);
+            Rectangle rect = new Rectangle(0, 10, 0, document.getPageSize().getHeight() - 10);
             rect.setBorder(Rectangle.BOX);
             rect.setBorderWidth(1);
             writer.setBoxSize("rectangle", rect);
@@ -71,7 +72,7 @@ public class PDFGen {
                 PdfPCell nomeDizimista = new PdfPCell(new Phrase(shortName(nome.toUpperCase()), boldCustom(9)));
                 nomeDizimista.setHorizontalAlignment(Element.ALIGN_LEFT);
                 nomeDizimista.setBorder(Rectangle.RIGHT);
-                nomeDizimista.setPaddingLeft(15);
+                nomeDizimista.setPaddingLeft(25);
                 nomeDizimista.setPaddingTop(5);
                 table.addCell(nomeDizimista);
                 table.addCell(nomeDizimista);
@@ -80,7 +81,7 @@ public class PDFGen {
                 PdfPCell cellData = new PdfPCell(new Phrase("Data: ______/______/_______\n\nValor: ____________________\n\nAss.: ____________________", normalCustom(11)));
                 cellData.setBorder(Rectangle.RIGHT);
                 cellData.setPaddingTop(20);
-                cellData.setPaddingLeft(15);
+                cellData.setPaddingLeft(25);
                 cellData.setHorizontalAlignment(Element.ALIGN_LEFT);
                 table.addCell(cellData);
                 table.addCell(cellData);
@@ -114,7 +115,7 @@ public class PDFGen {
         if (newMonth.length() == 1) newMonth = "0" + newMonth;
         PdfPCell codRef = new PdfPCell(new Phrase(cod +"                                 " + newMonth + " / " + String.valueOf(LocalDate.now().getYear()), boldCustomRed(11)));
                         codRef.setPaddingTop(10);
-                        codRef.setPaddingLeft(15);
+                        codRef.setPaddingLeft(25);
                 codRef.setHorizontalAlignment(Element.ALIGN_LEFT);
                 codRef.setBorder(Rectangle.RIGHT);
         return codRef;

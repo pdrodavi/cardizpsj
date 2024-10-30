@@ -1,6 +1,11 @@
 package com.pedrodavi.cardizpsj;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.text.Element;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -10,7 +15,7 @@ import java.time.LocalDate;
 import static com.pedrodavi.cardizpsj.PDFGen.generatePDF;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         Path currentDirectoryPath = FileSystems.getDefault().getPath("");
         String currentDirectoryName = currentDirectoryPath.toAbsolutePath().toString();
@@ -20,12 +25,45 @@ public class Main {
 
         String databaseURL = "jdbc:ucanaccess://dizimistas.accdb";
 
+//        JOptionPane meuJOPane = new JOptionPane("Teste");//instanciando o JOptionPane
+//        final JDialog dialog = meuJOPane.createDialog(null, "test");//aqui uso um JDialog para manipular
+//        //meu JOptionPane
+//        dialog.setModal(true);
+//        //Usando o javax.swing.Timer para poder gerar um evento em um tempo determinado
+//        //Veja o construtor da classe Timer para mais explicações
+//        Timer timer = new Timer(2 * 1000, new ActionListener() {
+//            public void actionPerformed(ActionEvent ev) {
+//                dialog.dispose();  //o evento(no caso fechar o meu JDialog)
+//            }
+//        });
+//        timer.start();
+//        dialog.setVisible(true);
+//        timer.stop();
+
+        int qtdTotal = 0;
+
+        JFrame f = new JFrame("Geração de Carnês");
+        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        f.setLocationRelativeTo(null);
+
         try (Connection connection = DriverManager.getConnection(databaseURL)) {
 
             String sql = "SELECT * FROM Dizimistas";
+            String sqlCount = "SELECT Count(*) AS TotalDizimistas FROM Dizimistas";
 
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(sql);
+            ResultSet result2 = statement.executeQuery(sqlCount);
+
+            while(result2.next()) {
+                qtdTotal = result2.getInt("TotalDizimistas");
+            }
+
+            Container content = f.getContentPane();
+            JProgressBar progressBar = new JProgressBar(1, qtdTotal);
+            JLabel label = new JLabel();
+
+            int qtdParc = 1;
 
             while (result.next()) {
 
@@ -52,6 +90,20 @@ public class Main {
                 out.write(bytes);
                 out.close();
 
+                label.setText(nameFile);
+                label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                progressBar.setValue(qtdParc);
+                progressBar.setStringPainted(true);
+                Border border = BorderFactory.createTitledBorder("Gerando " + qtdTotal + " carnês. Aguarde\n\n");
+                progressBar.setBorder(border);
+                content.add(progressBar, BorderLayout.NORTH);
+                content.add(label,BorderLayout.CENTER);
+                f.setSize(400, 100);
+                f.setVisible(true);
+
+                qtdParc++;
+
             }
 
         } catch (SQLException ex) {
@@ -60,7 +112,21 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        JOptionPane.showMessageDialog(null, "PDFS Gerados com sucesso");
+        f.dispose();
+
+        JFrame finished = new JFrame("Geração de Carnês");
+        Container contentF = finished.getContentPane();
+        finished.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        finished.setLocationRelativeTo(null);
+        JLabel labelF = new JLabel();
+        labelF.setText("Carnês em PDFS gerados com sucesso!");
+        labelF.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
+        labelF.setHorizontalAlignment(SwingConstants.CENTER);
+        contentF.add(labelF,BorderLayout.CENTER);
+        finished.setSize(400, 100);
+        finished.setVisible(true);
+        Thread.sleep(3500);
+        finished.dispose();
 
         try {
             Process exec = Runtime.getRuntime().exec("explorer.exe " + dirOutput);

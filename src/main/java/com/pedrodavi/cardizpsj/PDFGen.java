@@ -7,6 +7,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.List;
@@ -139,7 +140,11 @@ public class PDFGen {
 
         if (name.length() > 27) {
 
-            java.util.List<String> preposicoes = List.of("DE", "DA", "DAS", "DOS");
+            List<String> preposicoes = new ArrayList<>();
+            preposicoes.add("DE");
+            preposicoes.add("DA");
+            preposicoes.add("DAS");
+            preposicoes.add("DOS");
             String[] nomes = name.toUpperCase().split(" ");
 
             if (nomes.length < 2) {
